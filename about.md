@@ -12,7 +12,8 @@ GitHub: [chuckhays](http://github.com/chuckhays)
 
 
 ### Quick Facts
-* I am a software engineer located in the Twin Cities, MN. 
+* I am a software engineer located in the Twin Cities, MN.
+* I currently work at Google on the [WebRTC](http://webrtc.org/) team making an iOS app using WebRTC technology.
 * I am a [co-founder](#reconrobotics) of a miniature robotics company named [ReconRobotics](http://reconrobotics.com).
 * I studied computer science and robotics at the University of Minnesota.
 * My graduate research work was done at the [Center for Distributed Robotics](http://distrob.cs.umn.edu), where I was awarded a Master of Science in Computer Science.
