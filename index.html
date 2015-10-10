@@ -1,8 +1,73 @@
-<!DOCTYPE html>
-<html>
-<body>
-<h1>Hello World</h1>
-<p>I'm hosted with GitHub Pages.</p>
-<p>Edited from vim.</p>
-</body>
-</html>
+---
+layout: containerlesspage
+---
+
+<div class="jumbotron" style="margin-top:-20px">
+	<div class="container">
+		<div class="col-md-8">
+		<h1>
+			Chuck Hays
+		</h1>
+		<p>
+			Software engineer, builder &amp; tinkerer. Twin Cities, MN, USA.
+		</p>
+	</div>
+	<div class="col-md-4">
+		<img src="images/chuck.png" />
+	</div>
+	</div>
+</div>
+
+<div class="container">
+	<div class="row">
+		<div class="col-md-7">
+
+			<div id="home">
+			  <h2>Recent Posts</h2>
+			  <ul class="posts list-unstyled">
+			    {% for post in site.posts limit: 16 %}
+			      <li><a href="{{ post.url }}">{{ post.title }}</a> &nbsp; <span><small class="text-muted">{{ post.date | date: "%Y-%m-%d" }}</small></span></li>
+			    {% endfor %}
+			  </ul>
+			  <p><a href="/posts/">&raquo; Full list of posts</a></p>
+			</div>
+
+		</div>
+
+		<div class="col-md-5">
+			<h3 style="vertical-align: text-top">
+				<img src="images/msft.png" style="width: 70px; height: 70px" />
+				Microsoft Senior SDE
+			</h3>
+			<p>I worked for Microsoft as a Senior SDE (software development engineer) from 2008-2014, when the St. Paul, MN office (TCDC) was closed due to corporate restructuring.</p>
+
+			<p>During that time, I worked on several projects:</p>
+			<ul class="list-unstyled">
+				<li>&raquo; Expression Blend 2, 3 &amp; 4</li>
+				<li>&raquo; SketchFlow</li>
+				<li>&raquo; Blend for Visual Studio 2013 &amp; 2013</li>
+				<li>&raquo; Visual Studio 2012, 2013 &amp; "14" previews</li>
+				<li>&raquo; Azure AppPlat - Office 365 Video iOS app</li>
+				<li>&raquo; Azure AppPlat - Office 365 Video Azure backend service</li>
+			</ul>
+
+			<ul class="list-unstyled">
+				<li><a href="http://www.github.com/chuckhays/">&raquo; My GitHub profile</a></li>
+			</ul>
+
+			<h3>
+				<img src="images/robot_small.jpg" style="width: 70px; height: 70px" />
+				ReconRobotics	
+			</h3>
+			
+			<p>I'm a co-founder of <a href="http://www.reconrobotics.com/">ReconRobotics Inc.</a>, a robotics company that designs and manufactures tactical micro-robot systems for law enforcement and military personnel that increase situational awareness in order to save lives. More than 4,700 robots have been deployed world wide.</p>
+			
+
+			<ul class="list-unstyled">
+				<li><a href="http://www.fastcompany.com/most-innovative-companies/2013/industry/robotics">&raquo; Fast Company's 2013 most innovate robotics companies list (#2)</a></li>
+			</ul>
+
+		</div>
+		
+	</div>
+</div>

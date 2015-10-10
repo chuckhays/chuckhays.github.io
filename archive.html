@@ -1,0 +1,14 @@
+---
+layout: page
+title: Posts
+permalink: /posts/
+---
+<div id="post">
+	<h1>All posts</h1>
+
+	<ul>
+	{% for post in site.posts %}
+	<li><a href='{{ post.url }}' title="{{ post.title }}">{{ post.title }}</a> - {{ post.date | date: "%Y-%m-%d" }}</li>
+	{% endfor %}
+	</ul>
+</div>

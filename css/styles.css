@@ -1,0 +1,28 @@
+body {
+    padding-bottom: 40px;
+    padding-top: 70px;
+}
+
+p {
+	text-align: justify;
+}
+
+code, pre {
+    color: #333;
+}
+
+section {
+    padding-top: 42px;
+}
+
+.fancybox img {
+  margin: 5px;
+}
+
+/* Make tables spaced out a bit more */
+h2 + table,
+h3 + table,
+h4 + table,
+h2 + .row {
+  margin-top: 5px;
+}
