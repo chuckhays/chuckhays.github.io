@@ -5,7 +5,7 @@ permalink: /about/
 ---
 ## Who am I?
 
-Resume: [chuckhays.pdf](http://chuckhays.net/resumeFiles/resume071614.pdf) |
+Resume: [chuckhays.pdf](http://chuckhays.net/resumeFiles/chuckhays.pdf) |
 Twitter: [@chuckhays](https://twitter.com/chuckhays) |
 LinkedIn: [chuckhays](http://www.linkedin.com/in/chuckhays) |
 GitHub: [chuckhays](http://github.com/chuckhays)
