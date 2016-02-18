@@ -45,13 +45,17 @@ From the founding through 2008, I was responsible for various hardware and softw
 ### Some of the projects I worked on at Microsoft
 
 <a name="sketchflow"></a>
+
 #### SketchFlow
+
 SketchFlow is a tool that enables you to quickly create and prototype new ideas and present them to stakeholders for rapid feedback and iteration. It allows you to create prototypes that include interactivity, with as much or as little depth and fidelity as you need.
 
 ![SketchFlow map](../images/sketchflowmap.png "SketchFlow map")
 
 <a name="blend"></a>
+
 #### Blend
+
 Blend is the primary visual design tool for several Microsoft developer platforms:
 
 * WPF
@@ -67,10 +71,13 @@ I worked on several releases of Blend:
 * Visual Studio "14" preview releases
 
 <a name="vstools"></a>
+
 #### Visual Studio Designers
+
 I worked on the visual design tools included inside Visual Studio. The designer tools were based on the same shared technology and codebase as the Blend products, but had unique user interface and historical requirements as part of Visual Studio.
 
 <a name="appPlat"></a>
+
 #### Azure AppPlat - Office 365 Video Service
 
 On the Azure AppPlat team, I worked on a team that was creating both an iOS client app and the backend for the new Office 365 Video feature. Office 365 Video is described in the Office 365 road map as:
