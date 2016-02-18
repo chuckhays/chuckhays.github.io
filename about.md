@@ -42,7 +42,6 @@ From the founding through 2008, I was responsible for various hardware and softw
 ![ThrowBot](../images/robot.jpg "ThrowBot from ReconRobotics")
 
 
-
 ### Some of the projects I worked on at Microsoft
 
 <a name="sketchflow"></a>
