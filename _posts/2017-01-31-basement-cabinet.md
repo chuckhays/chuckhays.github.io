@@ -1,9 +1,9 @@
 ---
 layout: post
 comments: true
-title: Light Up Halloween Costumes
+title: Basement Speaker Cabinet
 categories: [projects]
-tags: [projects, electronics]
+tags: [projects, woodworking]
 published: false
 ---
 <div class="row">

@@ -1,7 +1,7 @@
 ---
 layout: post
 comments: true
-title: Light Up Halloween Costumes
+title: LED Kitchen Lights
 categories: [projects]
 tags: [projects, electronics]
 published: false
