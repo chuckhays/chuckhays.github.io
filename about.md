@@ -13,7 +13,9 @@ GitHub: [chuckhays](http://github.com/chuckhays)
 
 ### Quick Facts
 * I am a software engineer located in the Twin Cities, MN.
-* I currently work at Google on the [WebRTC](http://webrtc.org/) team building <a href="https://itunes.apple.com/us/app/google-duo-video-calling/id1096918571?mt=8">Google Duo</a> for iOS, a cross platform audio/video calling app.
+* I currently work at Google as a Staff Software Engineer/Tech Lead on the Video communication team.
+* Currently building building <a href="https://itunes.apple.com/us/app/google-duo-video-calling/id1096918571?mt=8">Google Meet</a> for iOS.
+* Formerly building Google Duo for iOS, a cross platform audio/video calling app.
 * I am a [co-founder](#reconrobotics) of a miniature robotics company named [ReconRobotics](http://reconrobotics.com).
 * I studied computer science and robotics at the University of Minnesota.
 * My graduate research work was done at the [Center for Distributed Robotics](http://distrob.cs.umn.edu), where I was awarded a Master of Science in Computer Science.
