@@ -12,7 +12,7 @@ GitHub: [chuckhays](http://github.com/chuckhays)
 
 
 ### Quick Facts
-* I am a software engineer located in the Twin Cities, MN.
+* I am a software engineer located in the Minneapolis, MN.
 * I currently work at Google as a Staff Software Engineer/Tech Lead on the Video communication team.
 * Led the effort to combine Google Duo and Google Meet apps on the iOS platform.
 * Currently building building <a href="https://itunes.apple.com/us/app/google-duo-video-calling/id1096918571?mt=8">Google Meet</a> for iOS.
