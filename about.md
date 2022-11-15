@@ -14,6 +14,7 @@ GitHub: [chuckhays](http://github.com/chuckhays)
 ### Quick Facts
 * I am a software engineer located in the Twin Cities, MN.
 * I currently work at Google as a Staff Software Engineer/Tech Lead on the Video communication team.
+* Led the effort to combine Google Duo and Google Meet apps on the iOS platform.
 * Currently building building <a href="https://itunes.apple.com/us/app/google-duo-video-calling/id1096918571?mt=8">Google Meet</a> for iOS.
 * Formerly building Google Duo for iOS, a cross platform audio/video calling app.
 * I am a [co-founder](#reconrobotics) of a miniature robotics company named [ReconRobotics](http://reconrobotics.com).
