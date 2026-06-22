@@ -38,17 +38,29 @@
 <body>
 
 <div class="container">
-    <h2>USGS 05289000 MISSISSIPPI RIVER AT ANOKA, MN</h2>
-    <p>Live 30-day gage height plotted against the historic median value and last year's recorded data.</p>
-
     <div id="usgsChart"></div>
 </div>
 
 <script>
     window.addEventListener('DOMContentLoaded', (event) => {
+        // Calculate the date range for "Last Year" dynamically
+        const now = new Date();
+        const thirtyDaysAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
+        
+        // Year shift bounds for comparison line
+        const lastYearStart = new Date(thirtyDaysAgo.getTime());
+        lastYearStart.setFullYear(lastYearStart.getFullYear() - 1);
+        
+        const lastYearEnd = new Date(now.getTime());
+        lastYearEnd.setFullYear(lastYearEnd.getFullYear() - 1);
+
+        // Format dates to YYYY-MM-DD
+        const formatDate = (d) => d.toISOString().split('T')[0];
+
         gwis.plot({
             div: 'usgsChart',
-            period: 'P30D', // Restricts the view bounds to a 30-day window
+            // Note: The global scope defines the graph display boundary window
+            period: 'P30D', 
             dygraphOptions: {
                 title: 'Gage Height Comparison',
                 ylabel: 'Gage height, feet',
@@ -56,26 +68,28 @@
                 connectSeparatedPoints: true
             },
             series: {
-                // Series 1: Live, real-time continuous data
+                // 1. Current Live Data (Defaults safely to global 30-day window)
                 'Current Live Data': {
                     siteNumber: '05289000',
                     parameterCode: '00065', 
-                    dataType: 'iv' // iv = Instantaneous Values
+                    dataType: 'iv' 
                 },
-                // Series 2: Daily mean values for last year 
-                // Note: GWIS automatically calculates shifts if it maps to historical frames
+                // 2. Last Year Data (Explicitly constrained to last year's calendar frames)
                 'Last Year Data': {
                     siteNumber: '05289000',
                     parameterCode: '00065',
-                    dataType: 'dv', // dv = Daily Values
-                    dvStatisticCode: '00003' // 00003 = Mean daily value
+                    dataType: 'dv',
+                    dvStatisticCode: '00003',
+                    startDT: formatDate(lastYearStart),
+                    endDT: formatDate(lastYearEnd),
+                    compare: true // Instructs GWIS to shift the timestamps visually forward onto today's axis scale
                 },
-                // Series 3: Long term historical day-of-year median
+                // 3. Historical Median (Requires 'stat' data engine type to access overall site summary metrics)
                 'Historical Median': {
                     siteNumber: '05289000',
                     parameterCode: '00065',
-                    dataType: 'dv',
-                    dvStatisticCode: '00002' // 00002 = Median daily value
+                    dataType: 'stat', // Changes data query engine to the long term stats calculator
+                    statType: 'median'
                 }
             }
         });
