@@ -1,10 +1,74 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Lake Minnetonka Water Level</title>
-  <meta http-equiv="refresh" content="3600">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embedded USGS Water Data Chart</title>
+    
+    <link rel="stylesheet" href="https://dashboard.waterdata.usgs.gov/api/gwis/2.1.1/gwis.min.css"/>
+    
+    <script src="https://dashboard.waterdata.usgs.gov/api/gwis/2.1.1/gwis.min.js"></script>
+
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h2 {
+            margin-top: 0;
+            color: #1a5276;
+            border-bottom: 2px solid #ebeeef;
+            padding-bottom: 10px;
+        }
+        /* Style the chart container */
+        #usgsChart {
+            width: 100%;
+            height: 450px;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-  <img src="https://waterdata.usgs.gov/nwisweb/graph?agency_cd=USGS&site_no=05289000&parm_cd=00065&period=30">
+
+<div class="container">
+    <h2>USGS 05289000 MISSISSIPPI RIVER AT ANOKA, MN</h2>
+    <p>Live 30-day continuous gage height data embedded directly from the USGS API.</p>
+
+    <div id="usgsChart"></div>
+</div>
+
+<script>
+    // Wait until the page loads to generate the graph
+    window.addEventListener('DOMContentLoaded', (event) => {
+        gwis.plot({
+            div: 'usgsChart',
+            period: 'P30D', // 30-day period (matches period=P30D in URL)
+            dygraphOptions: {
+                title: 'Gage Height (Last 30 Days)',
+                ylabel: 'Gage height, feet',
+                labelsUTC: false // Shows time in local timezone rather than UTC
+            },
+            series: {
+                'Gage Height': {
+                    siteNumber: '05289000', // Mississippi River at Anoka, MN
+                    parameterCode: '00065', // Parameter for Gage Height
+                    dataType: 'iv'         // IV = Instantaneous Values (Continuous data)
+                }
+            }
+        });
+    });
+</script>
+
 </body>
 </html>
