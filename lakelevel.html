@@ -3,98 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>USGS Chart with Historical Comparisons</title>
-    
-    <link rel="stylesheet" href="https://dashboard.waterdata.usgs.gov/api/gwis/2.1.1/gwis.min.css"/>
-    <script src="https://dashboard.waterdata.usgs.gov/api/gwis/2.1.1/gwis.min.js"></script>
-
+    <title>Embedded USGS Interactive Chart</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
             background-color: #f4f6f7;
             padding: 20px;
+            margin: 0;
         }
-        .container {
+        .chart-card {
             max-width: 950px;
             margin: 0 auto;
             background: #ffffff;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
         }
-        h2 {
-            margin-top: 0;
+        .chart-header {
+            padding: 20px 25px;
+            background-color: #fff;
+            border-bottom: 1px solid #ebeeef;
+        }
+        .chart-header h2 {
+            margin: 0 0 5px 0;
             color: #1a5276;
-            border-bottom: 2px solid #ebeeef;
-            padding-bottom: 10px;
+            font-size: 1.4rem;
         }
-        #usgsChart {
+        .chart-header p {
+            margin: 0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        /* This container crops the USGS page to show ONLY the graph area */
+        .iframe-crop-container {
             width: 100%;
-            height: 480px;
-            margin-top: 20px;
+            height: 650px; /* Adjust height to change how much of the graph controls are visible */
+            overflow: hidden;
+            position: relative;
+        }
+        .iframe-crop-container iframe {
+            position: absolute;
+            top: -240px; /* Pulls the page up to hide the USGS global header/banner */
+            left: 0;
+            width: 100%;
+            height: 900px; /* Total height of the frame to capture the graph + legend */
+            border: none;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div id="usgsChart"></div>
+<div class="chart-card">    
+    <div class="iframe-crop-container">
+        <iframe 
+            src="https://waterdata.usgs.gov/monitoring-location/USGS-05289000/#dataTypeId=continuous-00065-0&period=P30D&showFieldMeasurements=true&showMedian=true&compare=true"
+            loading="lazy">
+        </iframe>
+    </div>
 </div>
-
-<script>
-    window.addEventListener('DOMContentLoaded', (event) => {
-        // Calculate the date range for "Last Year" dynamically
-        const now = new Date();
-        const thirtyDaysAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
-        
-        // Year shift bounds for comparison line
-        const lastYearStart = new Date(thirtyDaysAgo.getTime());
-        lastYearStart.setFullYear(lastYearStart.getFullYear() - 1);
-        
-        const lastYearEnd = new Date(now.getTime());
-        lastYearEnd.setFullYear(lastYearEnd.getFullYear() - 1);
-
-        // Format dates to YYYY-MM-DD
-        const formatDate = (d) => d.toISOString().split('T')[0];
-
-        gwis.plot({
-            div: 'usgsChart',
-            // Note: The global scope defines the graph display boundary window
-            period: 'P30D', 
-            dygraphOptions: {
-                title: 'Gage Height Comparison',
-                ylabel: 'Gage height, feet',
-                labelsUTC: false,
-                connectSeparatedPoints: true
-            },
-            series: {
-                // 1. Current Live Data (Defaults safely to global 30-day window)
-                'Current Live Data': {
-                    siteNumber: '05289000',
-                    parameterCode: '00065', 
-                    dataType: 'iv' 
-                },
-                // 2. Last Year Data (Explicitly constrained to last year's calendar frames)
-                'Last Year Data': {
-                    siteNumber: '05289000',
-                    parameterCode: '00065',
-                    dataType: 'dv',
-                    dvStatisticCode: '00003',
-                    startDT: formatDate(lastYearStart),
-                    endDT: formatDate(lastYearEnd),
-                    compare: true // Instructs GWIS to shift the timestamps visually forward onto today's axis scale
-                },
-                // 3. Historical Median (Requires 'stat' data engine type to access overall site summary metrics)
-                'Historical Median': {
-                    siteNumber: '05289000',
-                    parameterCode: '00065',
-                    dataType: 'stat', // Changes data query engine to the long term stats calculator
-                    statType: 'median'
-                }
-            }
-        });
-    });
-</script>
 
 </body>
 </html>
