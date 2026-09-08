@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>USGS Chart with Historical Comparisons</title>
-    
+
+    <!-- Reused only for its bundled Dygraph library and default chart styling -->
     <link rel="stylesheet" href="https://dashboard.waterdata.usgs.gov/api/gwis/2.1.1/gwis.min.css"/>
     <script src="https://dashboard.waterdata.usgs.gov/api/gwis/2.1.1/gwis.min.js"></script>
 
@@ -38,61 +39,112 @@
 <body>
 
 <div class="container">
-    <div id="usgsChart"></div>
+    <div class="gwis"><div id="usgsChart"></div></div>
 </div>
 
 <script>
-    window.addEventListener('DOMContentLoaded', (event) => {
-        // Calculate the date range for "Last Year" dynamically
-        const now = new Date();
-        const thirtyDaysAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
-        
-        // Year shift bounds for comparison line
-        const lastYearStart = new Date(thirtyDaysAgo.getTime());
-        lastYearStart.setFullYear(lastYearStart.getFullYear() - 1);
-        
-        const lastYearEnd = new Date(now.getTime());
-        lastYearEnd.setFullYear(lastYearEnd.getFullYear() - 1);
+    window.addEventListener('DOMContentLoaded', async () => {
+        const SITE_NUMBER = '05289000';
+        const PARAMETER_CODE = '00065';
+        const DAYS = 30;
+        const API_ROOT = 'https://api.waterdata.usgs.gov';
 
-        // Format dates to YYYY-MM-DD
-        const formatDate = (d) => d.toISOString().split('T')[0];
+        const iso = (d) => d.toISOString();
 
-        gwis.plot({
-            div: 'usgsChart',
-            // Note: The global scope defines the graph display boundary window
-            period: 'P30D', 
-            dygraphOptions: {
+        // GWIS (dashboard.waterdata.usgs.gov) only fetches raw iv/dv series and has no
+        // concept of a prior-year overlay or a historical-median statistic. This chart
+        // instead calls the newer api.waterdata.usgs.gov service directly, which exposes
+        // both, and uses the Dygraph library bundled inside gwis.min.js to render them.
+        try {
+            const now = new Date();
+            const start = new Date(now.getTime() - DAYS * 24 * 60 * 60 * 1000);
+
+            const metaRes = await fetch(`${API_ROOT}/ogcapi/v0/collections/time-series-metadata/items` +
+                `?monitoring_location_id=USGS-${SITE_NUMBER}&parameter_code=${PARAMETER_CODE}`);
+            const meta = await metaRes.json();
+            const ivSeries = meta.features.find(f => f.properties.computation_identifier === 'Instantaneous');
+            const dailyMeanSeries = meta.features.find(f =>
+                f.properties.computation_period_identifier === 'Daily' && f.properties.computation_identifier === 'Mean');
+            if (!ivSeries || !dailyMeanSeries) {
+                throw new Error('Site/parameter time series metadata not found');
+            }
+
+            const fetchContinuous = async (timeRange) => {
+                const url = `${API_ROOT}/ogcapi/v0/collections/continuous/items?limit=50000` +
+                    `&properties=time,value&time_series_id=${ivSeries.properties.id}&time=${encodeURIComponent(timeRange)}`;
+                const res = await fetch(url);
+                const json = await res.json();
+                return json.features.map(f => ({ time: new Date(f.properties.time), value: parseFloat(f.properties.value) }));
+            };
+
+            const lastYearStart = new Date(start);
+            lastYearStart.setFullYear(lastYearStart.getFullYear() - 1);
+            const lastYearEnd = new Date(now);
+            lastYearEnd.setFullYear(lastYearEnd.getFullYear() - 1);
+
+            const [currentData, lastYearRaw, normalsRes] = await Promise.all([
+                fetchContinuous(`${iso(start)}/${iso(now)}`),
+                fetchContinuous(`${iso(lastYearStart)}/${iso(lastYearEnd)}`),
+                fetch(`${API_ROOT}/statistics/v0/observationNormals?parent_time_series_id=${dailyMeanSeries.properties.id}&computation_type=median`)
+                    .then(r => r.json()),
+            ]);
+
+            // Shift last year's timestamps forward a year so they overlay this year's axis.
+            const lastYearData = lastYearRaw.map(({ time, value }) => {
+                const shifted = new Date(time);
+                shifted.setFullYear(shifted.getFullYear() + 1);
+                return { time: shifted, value };
+            });
+
+            // Historical median is keyed by day-of-year ("MM-DD"); one point per day in the window.
+            const medianByDay = new Map(
+                normalsRes.features[0].properties.data[0].values.map(v => [v.time_of_year, parseFloat(v.value)])
+            );
+            const medianData = [];
+            for (let d = new Date(start); d <= now; d.setDate(d.getDate() + 1)) {
+                const key = `${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                if (medianByDay.has(key)) {
+                    const noon = new Date(d);
+                    noon.setHours(12, 0, 0, 0);
+                    medianData.push({ time: noon, value: medianByDay.get(key) });
+                }
+            }
+
+            // Merge the three series into one Dygraph-compatible matrix (one row per unique timestamp).
+            const seriesList = [currentData, lastYearData, medianData];
+            const allTimes = new Set();
+            seriesList.forEach(series => series.forEach(p => allTimes.add(p.time.getTime())));
+            const sortedTimes = Array.from(allTimes).sort((a, b) => a - b);
+            const lookups = seriesList.map(series => new Map(series.map(p => [p.time.getTime(), p.value])));
+            const dygraphData = sortedTimes.map(t => [
+                new Date(t),
+                ...lookups.map(map => (map.has(t) ? map.get(t) : null)),
+            ]);
+
+            new Dygraph(document.getElementById('usgsChart'), dygraphData, {
+                labels: ['Date', 'Current Live Data', 'Last Year Data', 'Historical Median'],
                 title: 'Gage Height Comparison',
                 ylabel: 'Gage height, feet',
                 labelsUTC: false,
-                connectSeparatedPoints: true
-            },
-            series: {
-                // 1. Current Live Data (Defaults safely to global 30-day window)
-                'Current Live Data': {
-                    siteNumber: '05289000',
-                    parameterCode: '00065', 
-                    dataType: 'iv' 
+                connectSeparatedPoints: true,
+                legend: 'always',
+                showRangeSelector: true,
+                axisLineColor: '#777',
+                axes: { y: { axisLabelFormatter: n => n.toLocaleString() } },
+                underlayCallback: (ctx, area) => {
+                    ctx.strokeStyle = '#777';
+                    ctx.strokeRect(area.x, area.y, area.w, area.h);
                 },
-                // 2. Last Year Data (Explicitly constrained to last year's calendar frames)
-                'Last Year Data': {
-                    siteNumber: '05289000',
-                    parameterCode: '00065',
-                    dataType: 'dv',
-                    dvStatisticCode: '00003',
-                    startDT: formatDate(lastYearStart),
-                    endDT: formatDate(lastYearEnd),
-                    compare: true // Instructs GWIS to shift the timestamps visually forward onto today's axis scale
+                series: {
+                    'Current Live Data': { color: '#0868ac', strokeWidth: 2 },
+                    'Last Year Data': { color: '#999999', strokePattern: [6, 4] },
+                    'Historical Median': { color: '#e6550d', strokePattern: [2, 3] },
                 },
-                // 3. Historical Median (Requires 'stat' data engine type to access overall site summary metrics)
-                'Historical Median': {
-                    siteNumber: '05289000',
-                    parameterCode: '00065',
-                    dataType: 'stat', // Changes data query engine to the long term stats calculator
-                    statType: 'median'
-                }
-            }
-        });
+            });
+        } catch (err) {
+            console.error('Failed to load USGS chart data', err);
+            document.getElementById('usgsChart').textContent = 'Data Unavailable';
+        }
     });
 </script>
 
