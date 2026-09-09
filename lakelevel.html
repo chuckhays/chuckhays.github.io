@@ -83,6 +83,13 @@
             padding: 15px 20px;
             text-align: center;
         }
+        .stat-swatch {
+            width: 40px;
+            height: 0;
+            margin: 0 auto 8px;
+            border-top-width: 3px;
+            border-top-color: transparent;
+        }
         .stat-card .stat-label {
             font-size: 0.85em;
             color: var(--stat-label);
@@ -124,14 +131,17 @@
     <div class="main-row">
         <div class="stats-row" id="usgsStats">
             <div class="stat-card" data-stat="current">
+                <div class="stat-swatch"></div>
                 <div class="stat-label">Current Live Data</div>
                 <div class="stat-value">&hellip;</div>
             </div>
             <div class="stat-card" data-stat="lastYear">
+                <div class="stat-swatch"></div>
                 <div class="stat-label">Last Year Data</div>
                 <div class="stat-value">&hellip;</div>
             </div>
             <div class="stat-card" data-stat="median">
+                <div class="stat-swatch"></div>
                 <div class="stat-label">Historical Median</div>
                 <div class="stat-value">&hellip;</div>
             </div>
@@ -151,6 +161,26 @@
         const API_ROOT = 'https://api.waterdata.usgs.gov';
 
         const iso = (d) => d.toISOString();
+
+        // Dygraph paints directly onto a <canvas>, so dark mode needs its own color set
+        // here — CSS alone can't reach gridlines, axis lines, or the underlay border.
+        const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const chartColors = isDark
+            ? { line: '#8899a6', grid: '#333f48', current: '#4da6ff', lastYear: '#9aa7b2', median: '#ff9955' }
+            : { line: '#777777', grid: '#e5e5e5', current: '#0868ac', lastYear: '#999999', median: '#e6550d' };
+
+        // The stat cards double as a legend, so their swatches must match each series'
+        // line color and dash pattern used in the chart below.
+        const swatchStyles = {
+            current: { style: 'solid', color: chartColors.current },
+            lastYear: { style: 'dashed', color: chartColors.lastYear },
+            median: { style: 'dotted', color: chartColors.median },
+        };
+        Object.entries(swatchStyles).forEach(([key, { style, color }]) => {
+            const swatch = document.querySelector(`.stat-card[data-stat="${key}"] .stat-swatch`);
+            swatch.style.borderTopStyle = style;
+            swatch.style.borderTopColor = color;
+        });
 
         // GWIS (dashboard.waterdata.usgs.gov) only fetches raw iv/dv series and has no
         // concept of a prior-year overlay or a historical-median statistic. This chart
@@ -245,13 +275,6 @@
                 new Date(t),
                 ...lookups.map(map => (map.has(t) ? map.get(t) : null)),
             ]);
-
-            // Dygraph paints directly onto a <canvas>, so dark mode needs its own color set
-            // here — CSS alone can't reach gridlines, axis lines, or the underlay border.
-            const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const chartColors = isDark
-                ? { line: '#8899a6', grid: '#333f48', current: '#4da6ff', lastYear: '#9aa7b2', median: '#ff9955' }
-                : { line: '#777777', grid: '#e5e5e5', current: '#0868ac', lastYear: '#999999', median: '#e6550d' };
 
             new Dygraph(document.getElementById('usgsChart'), dygraphData, {
                 labels: ['Date', 'Current Live Data', 'Last Year Data', 'Historical Median'],
