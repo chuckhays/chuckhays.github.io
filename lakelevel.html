@@ -10,29 +10,18 @@
     <script src="https://dashboard.waterdata.usgs.gov/api/gwis/2.1.1/gwis.min.js"></script>
 
     <style>
+        /* Always dark: the dashboard embedding this page doesn't pass through
+           prefers-color-scheme, so theme can't be detected — it's forced here instead. */
         :root {
-            --bg: #f4f6f7;
-            --card-bg: #ffffff;
-            --stat-bg: #f4f6f7;
-            --text: #2c3e50;
-            --heading: #1a5276;
-            --border: #ebeeef;
-            --shadow: rgba(0,0,0,0.08);
-            --stat-label: #5d6d7e;
-            --stat-value: #1a5276;
-        }
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg: #12181d;
-                --card-bg: #1c252c;
-                --stat-bg: #222d35;
-                --text: #dfe6ec;
-                --heading: #7fb3e0;
-                --border: #2e3944;
-                --shadow: rgba(0,0,0,0.4);
-                --stat-label: #93a4b3;
-                --stat-value: #7fb3e0;
-            }
+            --bg: #12181d;
+            --card-bg: #1c252c;
+            --stat-bg: #222d35;
+            --text: #dfe6ec;
+            --heading: #7fb3e0;
+            --border: #2e3944;
+            --shadow: rgba(0,0,0,0.4);
+            --stat-label: #93a4b3;
+            --stat-value: #7fb3e0;
         }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
@@ -164,10 +153,8 @@
 
         // Dygraph paints directly onto a <canvas>, so dark mode needs its own color set
         // here — CSS alone can't reach gridlines, axis lines, or the underlay border.
-        const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const chartColors = isDark
-            ? { line: '#8899a6', grid: '#333f48', current: '#4da6ff', lastYear: '#9aa7b2', median: '#ff9955' }
-            : { line: '#777777', grid: '#e5e5e5', current: '#0868ac', lastYear: '#999999', median: '#e6550d' };
+        // Always dark (see :root above) since the dashboard doesn't pass through prefers-color-scheme.
+        const chartColors = { line: '#8899a6', grid: '#333f48', current: '#4da6ff', lastYear: '#9aa7b2', median: '#ff9955' };
 
         // The stat cards double as a legend, so their swatches must match each series'
         // line color and dash pattern used in the chart below.
