@@ -148,6 +148,12 @@
         const PARAMETER_CODE = '00065';
         const DAYS = 30;
         const API_ROOT = 'https://api.waterdata.usgs.gov';
+        // The dashboard embeds this page in an iframe and passes its own key via
+        // ?api_key=... on the iframe src, so the key never has to live in this file.
+        const API_KEY = new URLSearchParams(window.location.search).get('api_key') || '';
+        // Passed as a query param (not a header) so the request stays a "simple" CORS
+        // request — the statistics/v0 endpoint's preflight rejects a custom header.
+        const apiFetch = (url) => fetch(`${url}${url.includes('?') ? '&' : '?'}api_key=${encodeURIComponent(API_KEY)}`);
 
         const iso = (d) => d.toISOString();
 
@@ -177,7 +183,7 @@
             const now = new Date();
             const start = new Date(now.getTime() - DAYS * 24 * 60 * 60 * 1000);
 
-            const metaRes = await fetch(`${API_ROOT}/ogcapi/v0/collections/time-series-metadata/items` +
+            const metaRes = await apiFetch(`${API_ROOT}/ogcapi/v0/collections/time-series-metadata/items` +
                 `?monitoring_location_id=USGS-${SITE_NUMBER}&parameter_code=${PARAMETER_CODE}`);
             const meta = await metaRes.json();
             const ivSeries = meta.features.find(f => f.properties.computation_identifier === 'Instantaneous');
@@ -190,7 +196,7 @@
             const fetchContinuous = async (timeRange) => {
                 const url = `${API_ROOT}/ogcapi/v0/collections/continuous/items?limit=50000` +
                     `&properties=time,value&time_series_id=${ivSeries.properties.id}&time=${encodeURIComponent(timeRange)}`;
-                const res = await fetch(url);
+                const res = await apiFetch(url);
                 const json = await res.json();
                 return json.features.map(f => ({ time: new Date(f.properties.time), value: parseFloat(f.properties.value) }));
             };
@@ -209,13 +215,13 @@
             const [currentData, lastYearRaw, normalsRes, latestRes, lastYearDayRes, medianTodayRes] = await Promise.all([
                 fetchContinuous(`${iso(start)}/${iso(now)}`),
                 fetchContinuous(`${iso(lastYearStart)}/${iso(lastYearEnd)}`),
-                fetch(`${API_ROOT}/statistics/v0/observationNormals?parent_time_series_id=${dailyMeanSeries.properties.id}&computation_type=median`)
+                apiFetch(`${API_ROOT}/statistics/v0/observationNormals?parent_time_series_id=${dailyMeanSeries.properties.id}&computation_type=median`)
                     .then(r => r.json()),
-                fetch(`${API_ROOT}/ogcapi/v0/collections/latest-continuous/items?monitoring_location_id=USGS-${SITE_NUMBER}&parameter_code=${PARAMETER_CODE}&f=json`)
+                apiFetch(`${API_ROOT}/ogcapi/v0/collections/latest-continuous/items?monitoring_location_id=USGS-${SITE_NUMBER}&parameter_code=${PARAMETER_CODE}&f=json`)
                     .then(r => r.json()),
-                fetch(`${API_ROOT}/ogcapi/v0/collections/daily/items?monitoring_location_id=USGS-${SITE_NUMBER}&parameter_code=${PARAMETER_CODE}&time=${ymd(oneYearAgo)}&f=json`)
+                apiFetch(`${API_ROOT}/ogcapi/v0/collections/daily/items?monitoring_location_id=USGS-${SITE_NUMBER}&parameter_code=${PARAMETER_CODE}&time=${ymd(oneYearAgo)}&f=json`)
                     .then(r => r.json()),
-                fetch(`${API_ROOT}/statistics/v0/observationNormals?parent_time_series_id=${dailyMeanSeries.properties.id}` +
+                apiFetch(`${API_ROOT}/statistics/v0/observationNormals?parent_time_series_id=${dailyMeanSeries.properties.id}` +
                     `&computation_type=median&start_date=${todayMonthDay}&end_date=${todayMonthDay}`)
                     .then(r => r.json()),
             ]);
