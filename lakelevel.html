@@ -94,6 +94,17 @@
             color: var(--text) !important;
             background-color: transparent !important;
         }
+        /* Rendered via Dygraph's labelsDiv option so the legend flows in normal
+           layout and wraps, instead of the default absolutely-positioned overlay
+           that runs off the right edge once series labels get long. */
+        .chart-legend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 4px 16px;
+            padding: 8px 0 0;
+            font-size: 0.85em;
+        }
     </style>
 </head>
 <body>
@@ -113,7 +124,10 @@
             <div class="stat-value">&hellip;</div>
         </div>
     </div>
-    <div class="gwis"><div id="usgsChart"></div></div>
+    <div class="gwis">
+        <div id="usgsChart"></div>
+        <div id="chartLegend" class="chart-legend"></div>
+    </div>
 </div>
 
 <script>
@@ -233,6 +247,7 @@
                 labelsUTC: false,
                 connectSeparatedPoints: true,
                 legend: 'always',
+                labelsDiv: document.getElementById('chartLegend'),
                 showRangeSelector: true,
                 axisLineColor: chartColors.line,
                 gridLineColor: chartColors.grid,
